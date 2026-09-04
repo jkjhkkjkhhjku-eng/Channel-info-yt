@@ -30,6 +30,7 @@
     --twitch:#A970FF;
     --x:#EDEAE0;
     --discord:#7C8AFF;
+    --fb:#1877F2;
   }
 
   *{ box-sizing:border-box; }
@@ -246,6 +247,7 @@
   .twitch{ --accent: var(--twitch); }
   .xcom{ --accent: var(--x); }
   .discord{ --accent: var(--discord); }
+  .fb{ --accent: var(--fb); }
 
   footer{
     margin-top:36px;
@@ -254,10 +256,42 @@
     opacity:0.65;
   }
 
+  /* ---- entrance animations ---- */
+  @keyframes riseIn{
+    from{ opacity:0; transform:translateY(14px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+
+  .avatar-wrap, h1, .rule, .bio, .tags, .links .link-btn, footer{
+    opacity:0;
+    animation:riseIn 0.65s cubic-bezier(.2,.7,.3,1) forwards;
+  }
+  .avatar-wrap{ animation-delay:0.05s; }
+  h1{ animation-delay:0.16s; }
+  .rule{ animation-delay:0.24s; }
+  .bio{ animation-delay:0.30s; }
+  .tags{ animation-delay:0.38s; }
+  .links .link-btn:nth-child(1){ animation-delay:0.46s; }
+  .links .link-btn:nth-child(2){ animation-delay:0.54s; }
+  .links .link-btn:nth-child(3){ animation-delay:0.62s; }
+  .links .link-btn:nth-child(4){ animation-delay:0.70s; }
+  .links .link-btn:nth-child(5){ animation-delay:0.78s; }
+  footer{ animation-delay:0.82s; }
+
+  /* ---- hover tilt (JS sets the transform; this just enables it) ---- */
+  .link-btn{
+    transform-style:preserve-3d;
+    will-change:transform;
+  }
+
   @media (prefers-reduced-motion: reduce){
     .avatar-ring{ animation:none; }
     .link-btn{ transition:none; }
     .bg-video{ display:none; }
+    .avatar-wrap, h1, .rule, .bio, .tags, .links .link-btn, footer{
+      opacity:1;
+      animation:none;
+    }
   }
 </style>
 </head>
@@ -312,11 +346,43 @@
       <span class="label">Join the Discord server<span class="platform">Hang out & chat</span></span>
     </a>
 
+    <a class="link-btn fb" href="https://www.facebook.com/profile.php?id=61593866439130" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.4h-1.3c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.4v7A10 10 0 0 0 22 12Z"/></svg>
+      <span class="label">Follow on Facebook<span class="platform">Shimanto-ryu</span></span>
+    </a>
+
   </div>
 
   <footer>See you in stream.</footer>
 
 </main>
+
+<script>
+(function(){
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---- hover tilt on link buttons ----
+  var coarsePointer = window.matchMedia('(pointer: coarse)').matches;
+  if(!reduceMotion && !coarsePointer){
+    var buttons = document.querySelectorAll('.link-btn');
+    buttons.forEach(function(btn){
+      btn.addEventListener('mousemove', function(e){
+        var rect = btn.getBoundingClientRect();
+        var x = e.clientX - rect.left;
+        var y = e.clientY - rect.top;
+        var midX = rect.width / 2;
+        var midY = rect.height / 2;
+        var rotateY = ((x - midX) / midX) * 4;
+        var rotateX = ((midY - y) / midY) * 4;
+        btn.style.transform = 'perspective(600px) translateY(-2px) rotateX(' + rotateX.toFixed(2) + 'deg) rotateY(' + rotateY.toFixed(2) + 'deg)';
+      });
+      btn.addEventListener('mouseleave', function(){
+        btn.style.transform = '';
+      });
+    });
+  }
+})();
+</script>
 
 </body>
 </html>
